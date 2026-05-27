@@ -1843,52 +1843,9 @@ awk '$9 ~ /^5/' "$log" | wc -l
 | **TruffleHog clean** (auto-fail if any leaked secret in history) | 5      |
 
 
-### 🟡 Part B — Cloud Track
-
-For students who have:
-
-- A free-tier cloud VM (**Oracle ARM is best** — 4 cores / 24 GB RAM, free forever; AWS t2.micro and GCP e2-micro also work)
-- **A real domain** (~$1/yr `.xyz` from Namecheap, or use Cloudflare's free subdomain)
-
-#### What to Do
-
-1. Provision a VM (manual setup is fine for this week; Week 5 teaches Terraform)
-2. Run your `scripts/deploy.sh` from Part A against the new VM
-3. Point your domain at the VM's public IP (via Cloudflare DNS)
-4. Get a **real Let's Encrypt cert** via Certbot:
-  ```bash
-   sudo certbot --nginx -d api.yourdomain.com
-  ```
-5. **Harden SSH**:
-  - Disable root login: `PermitRootLogin no` in `/etc/ssh/sshd_config`
-  - Key-only auth: `PasswordAuthentication no`
-  - Install fail2ban: `sudo apt install fail2ban`
-  - (Optional) Move SSH off port 22
-6. App keeps running after you close laptop (it's on the VM under systemd)
-7. Verify cert from another machine: `curl -v https://api.yourdomain.com/`
-
-#### Submission Checklist (Part B)
-
-- Public URL responds: `curl -sI https://api.yourdomain.com/` returns 200
-- Real Let's Encrypt cert (`curl -v` shows `subject: CN=api.yourdomain.com`)
-- SSH hardened (`sshd -T | grep -i 'permitrootlogin\|passwordauth'`)
-- README section "Cloud Deployment" reproducible end-to-end
-- Screenshot of cert details
-
-#### Grading Rubric — Part B (+10 pts)
-
-
-| Criterion                                     | Points |
-| --------------------------------------------- | ------ |
-| Live public URL                               | 3      |
-| Real Let's Encrypt cert visible in `curl -v`  | 3      |
-| SSH hardened (key-only, no root, fail2ban)    | 2      |
-| README documents the cloud setup reproducibly | 2      |
-
-
 ---
 
-## Alternative Mini-Project Ideas
+## Alternative Mini-Project Ideas (Optional) 
 
 Pick one of these instead of the default.
 

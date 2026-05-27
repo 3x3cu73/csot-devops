@@ -6,27 +6,24 @@
 
 ---
 
-## 📖 Documentation
 
-- **[Comprehensive Guide](./Comprehensive-Guide.md)** — full curriculum design, rubrics, mentor notes
-- **[Weekly content (`content/`)](./content/)** — one markdown guide per week (modules, builds, mini-projects, contest pitch)
 
 ### Weekly content (start here each week)
 
 
 | Week | Guide                                                                                                        | Focus                                                                                                                      |
 | ---- | ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| 1    | [week-01-linux-networking-git.md](./content/week-01-linux-networking-git.md)                                 | Linux, shell, networking, Git, nginx, systemd · [Week 1 contest](https://csot-devops.devclub.in/contest/week-01) (100 pts) |
-| 2    | [week-02-cicd-quality-registries.md](./content/week-02-cicd-quality-registries.md)                           | CI/CD, GitHub Actions, quality gates, GHCR                                                                                 |
-| 3    | [week-03-containers-compose-security.md](./content/week-03-containers-compose-security.md)                   | Docker, Compose, image security                                                                                            |
-| 4    | [week-04-kubernetes-helm-gitops.md](./content/week-04-kubernetes-helm-gitops.md)                             | Kubernetes, Helm, GitOps                                                                                                   |
-| 5    | [week-05-iac-aws-cloudflare-finops.md](./content/week-05-iac-aws-cloudflare-finops.md)                       | Terraform, AWS, Cloudflare, FinOps                                                                                         |
-| 6    | [week-06-observability-sre-devsecops-capstone.md](./content/week-06-observability-sre-devsecops-capstone.md) | Observability, SRE, capstone                                                                                               |
+| 1    | [week-01-linux-networking-git.md](./content/week-01-linux-networking-git.md)                                 | Linux, shell, networking, Git, nginx, systemd · [Week 1 contest](https://csot-devops.devclub.in/contest/week-01) (100 pts) · [submission guide](./submission/README.md) |
+| 2    | Week 2                                                                                                       | CI/CD, GitHub Actions, quality gates, GHCR                                                                                 |
+| 3    | Week 3                                                                                                       | Docker, Compose, image security                                                                                            |
+| 4    | Week 4                                                                                                       | Kubernetes, Helm, GitOps                                                                                                   |
+| 5    | Week 5                                                                                                       | Terraform, AWS, Cloudflare, FinOps                                                                                         |
+| 6    | Week 6                                                                                                       | Observability, SRE, capstone                                                                                               |
 
 
 Read the week's guide for teaching material. 
 
-**Week 1 includes a mandatory contest** (100 points, runs the full week) at **[csot-devops.devclub.in](https://csot-devops.devclub.in)** 
+**Week 1 includes a mandatory contest** (100 points, runs the full week) at **[csot-devops.devclub.in](https://csot-devops.devclub.in)** — see the **[submission guidelines](./submission/README.md)** for how to install the `csot` CLI and submit.
 
 ---
 
@@ -34,7 +31,7 @@ Read the week's guide for teaching material.
 
 ### Week 1 — Linux, Networking, Git & Sysadmin Foundations
 
- **[Read Week 1 content](./content/week-01-linux-networking-git.md)** · 🏆 **[Week 1 contest](https://csot-devops.devclub.in/contest/week-01)** (12 tasks, **100 points**, autograded)
+ **[Read Week 1 content](./content/week-01-linux-networking-git.md)** · 🏆 **[Week 1 contest](https://csot-devops.devclub.in/contest/week-01)** (12 tasks, **100 points**, autograded) · 📥 **[Submission guidelines](./submission/README.md)**
 
 Master the OS and the network — the bedrock everything else stacks on. Topics covered:
 
@@ -169,11 +166,10 @@ Cloud bonuses (AWS / GCP / managed Kubernetes) are **optional** for students who
 
 ## 🚀 Getting Started
 
-1. Read the **[Comprehensive Guide](./Comprehensive-Guide.md)** for the full picture
-2. Open **[Week 1](./content/week-01-linux-networking-git.md)** — modules, builds, and mini-project live in `**content/`** (one file per week)
-3. Set up Linux / WSL, install Git, Docker, GitHub CLI (see Week 1's *Tools & Software Used*)
-4. Complete the **mandatory** **[Week 1 contest](https://csot-devops.devclub.in/contest/week-01)** (`csot` CLI, 100 points, open all week) and ship the mini-project
-5. Each following week: read the matching `content/week-0N-*.md` guide before that week's builds
+1. Open **[Week 1](./content/week-01-linux-networking-git.md)** — modules, builds, and mini-project live in `**content/`** (one file per week)
+2. Set up Linux / WSL, install Git, Docker, GitHub CLI (see Week 1's *Tools & Software Used*)
+3. Complete the **mandatory** **[Week 1 contest](https://csot-devops.devclub.in/contest/week-01)** (`csot` CLI, 100 points, open all week) — follow the **[submission guidelines](./submission/README.md)** for install + submit steps — and ship the mini-project
+4. Each following week: read the matching `content/week-0N-*.md` guide before that week's builds
 
 ---
 
