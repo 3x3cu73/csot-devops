@@ -12,8 +12,8 @@
 | Week | Guide                                                                        | Focus                                                                                                                                                                                                      |
 | ---- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1    | [week-01-linux-networking-git.md](./content/week-01-linux-networking-git.md) | Linux, shell, networking, Git, nginx, systemd · [contest](https://csot-devops.devclub.in/contest/week-01) (100 pts, [submit guide](./submission/README.md)) · [mini-project](./projects/week-01/README.md) |
-| 2    | Week 2                                                                       | CI/CD, GitHub Actions, quality gates, GHCR                                                                                                                                                                 |
-| 3    | Week 3                                                                       | Docker, Compose, image security                                                                                                                                                                            |
+| 2    | [week-02-docker-compose-debugging.md](./content/week-02-docker-compose-debugging.md) | Docker, Compose, container debugging, image hygiene · [contest](https://csot-devops.devclub.in/contest/week-02) (200 pts, [submit guide](./submission/README.md)) · [mini-project](./projects/week-02/README.md) |
+| 3    | Week 3                                                                       | CI/CD, GitHub Actions, quality gates, GHCR                                                                                                                                                                 |
 | 4    | Week 4                                                                       | Kubernetes, Helm, GitOps                                                                                                                                                                                   |
 | 5    | Week 5                                                                       | Terraform, AWS, Cloudflare, FinOps                                                                                                                                                                         |
 | 6    | Week 6                                                                       | Observability, SRE, capstone                                                                                                                                                                               |
@@ -106,7 +106,23 @@ Master the OS and the network — the bedrock everything else stacks on. Topics 
 - **Git & GitHub Mastery** — branching, merge vs rebase, conflict resolution, `git stash` / `reflog` / `bisect`, GitHub Flow vs Git Flow vs Trunk-Based, conventional commits
 - **Secrets Hygiene** — `.env` pattern, pre-commit hooks, **TruffleHog** secret scanning, leak response (rotate, revoke)
 
-### Week 2 — CI/CD, Quality Engineering & Registries
+### Week 2 — Containers, Compose & Image Security
+
+ **[Read Week 2 content](./content/week-02-docker-compose-debugging.md)** · 🏆 **[Week 2 contest](https://csot-devops.devclub.in/contest/week-02)** (12 tasks, **200 pts**, autograded — [contest submit guide](./submission/README.md)) · 📦 **[Mini-project](./projects/week-02/README.md)** (50 pts, form-submitted)
+
+Package once, run anywhere — securely and slim, then debug it when it breaks. Topics covered:
+
+- **Container Fundamentals** — Linux namespaces, cgroups, containers vs VMs, Docker architecture (daemon, containerd, runc), images vs containers, OCI standard
+- **Writing Dockerfiles** — layer caching + instruction ordering, **multi-stage builds**, `.dockerignore`, base image choices (slim / alpine / distroless), `HEALTHCHECK`, image-digest pinning
+- **Container Runtime** — Docker networking (bridge, host, custom), volumes (bind, named, tmpfs), environment vars, debugging (`logs`, `exec`, `inspect`, `dive`)
+- **Multi-Service with `docker compose`** — services, networks, volumes, `depends_on` + healthcheck conditions, override files, dev vs prod compose
+- **Incident Response & Debugging** — reproducing flaky stacks, startup-order races, permission/volume bugs, fixing live containers via `exec` (the contest's "2 AM page" scenarios)
+- **Image Security & Supply Chain** — **Trivy** vulnerability scanning, **Syft** for SBOM, **cosign** image signing, multi-arch builds with `buildx`
+- **Registries** — GHCR (primary), Docker Hub, ECR, Quay, Harbor
+- **12-Factor App Recap (Container Edition)** — config via env, log to stdout, stateless processes, dev/prod parity
+- **Cloudflare Tunnels** — public HTTPS for local containers with `cloudflared`, quick vs named tunnels
+
+### Week 3 — CI/CD, Quality Engineering & Registries
 
 Automate everything from commit to artifact, and never let a broken or insecure build ship. Topics covered:
 
@@ -118,19 +134,6 @@ Automate everything from commit to artifact, and never let a broken or insecure 
 - **Repo Hygiene & Release Automation** — semantic versioning, conventional commits, `semantic-release`, `release-please`, auto-CHANGELOG, required status checks
 - **Jenkins Awareness** — architecture (master/agent), Jenkinsfile (declarative pipeline), when companies still use Jenkins
 - **Other CI Tools (Brief)** — GitLab CI, CircleCI, Travis, Drone CI
-
-### Week 3 — Containers, Compose & Image Security
-
-Package once, run anywhere — securely and slim. Topics covered:
-
-- **Container Fundamentals** — Linux namespaces, cgroups, containers vs VMs, Docker architecture (daemon, containerd, runc), images vs containers, OCI standard
-- **Writing Dockerfiles** — layer caching + instruction ordering, **multi-stage builds**, `.dockerignore`, base image choices (slim / alpine / distroless), `HEALTHCHECK`, image-digest pinning
-- **Container Runtime** — Docker networking (bridge, host, custom), volumes (bind, named, tmpfs), environment vars, debugging (`logs`, `exec`, `inspect`, `dive`)
-- **Multi-Service with `docker compose`** — services, networks, volumes, `depends_on` + healthcheck conditions, override files, dev vs prod compose
-- **Image Security & Supply Chain** — **Trivy** vulnerability scanning, **Syft** for SBOM, **cosign** image signing, multi-arch builds with `buildx`
-- **Registries** — GHCR (primary), Docker Hub, ECR, Quay, Harbor
-- **12-Factor App Recap (Container Edition)** — config via env, log to stdout, stateless processes, dev/prod parity
-- **Cloudflare Tunnels** — public HTTPS for local containers with `cloudflared`, quick vs named tunnels
 
 ### Week 4 — Kubernetes, Helm & GitOps
 
