@@ -1,301 +1,174 @@
-# Week 3 — Projects & Submissions
+# Week 3 Project — Production CI/CD Pipeline
 
-> **Theme**: Production-grade CI/CD pipeline for your Week 2 containerized app.
->
-> **Submission type:** public **GitHub repository** (+ portal form) — not `csot submit` file uploads.
->
-> **Deadline:** Sunday 11:59 PM (IST)
->
-> **Points:** 100 (mandatory) + optional 10 (cloud bonus)
->
-> **What to learn / build this week:** [`week-03-guide.md`](./week-03-guide.md)  
-> **Module deep-dive:** [`content/week-02-cicd-quality-registries.md`](./content/week-02-cicd-quality-registries.md)
+## What you submit
 
----
+**One public GitHub repository** — the same repo as your Week 2 Docker project, now with CI/CD on top.
 
-## Table of Contents
+Submit on **[csot-devops.devclub.in/submission](https://csot-devops.devclub.in/submission)** → Week 3:
 
-1. [Submission type](#submission-type)
-2. [Prerequisites (Week 2)](#prerequisites-week-2)
-3. [Default project — Production-Grade CI Pipeline](#default-project--production-grade-ci-pipeline)
-4. [Scoring overview (100 pts)](#scoring-overview-100-pts)
-5. [Part A — Quality gates (25 pts)](#part-a--quality-gates-25-pts)
-6. [Part B — Security in CI (15 pts)](#part-b--security-in-ci-15-pts)
-7. [Part C — GHCR build & push (25 pts)](#part-c--ghcr-build--push-25-pts)
-8. [Part D — Pipeline engineering (20 pts)](#part-d--pipeline-engineering-20-pts)
-9. [Part E — Documentation & proof (15 pts)](#part-e--documentation--proof-15-pts)
-10. [Required repo layout](#required-repo-layout)
-11. [How to submit](#how-to-submit)
-12. [Submission checklist](#submission-checklist)
-13. [Alternative project ideas](#alternative-project-ideas)
-14. [Optional cloud bonus (+10 pts)](#optional-cloud-bonus-10-pts)
-15. [Common failures](#common-failures)
-16. [Self-check before submit](#self-check-before-submit)
+| Field | Example |
+|-------|---------|
+| GitHub repository URL | `https://github.com/you/my-app` |
+| Assignment folder | `.` (repo root) |
+
+After you submit, the autograder **clones your repo** and scores it within a few minutes. Check the **leaderboard** and your dashboard for the breakdown.
 
 ---
 
-## Submission type
+## Prerequisites (from Week 2)
 
-| | |
-|---|---|
-| **Deliverable** | One **public GitHub repo** with a green CI pipeline + GHCR image |
-| **Portal** | [csot-devops.devclub.in/submission](https://csot-devops.devclub.in/submission) → Week 3 |
-| **What you paste** | Repo URL, link to latest **green** Actions run, GHCR image URL |
-| **Not accepted** | Private repos, repos with no `.github/workflows/`, pipelines that push on red |
+Your repo must already contain:
 
-Mentor smoke test (~10 minutes):
+- `Dockerfile` — builds your app
+- `compose.yaml` (or `docker-compose.yml`) — **≥2 services** (app + database), with a **healthcheck**
+- App that runs with `docker compose up --build`
 
-1. Open your latest green Actions run on `main`.
-2. Confirm required jobs passed (lint, test, schema, secret scan, build-push).
-3. `docker pull ghcr.io/<you>/<repo>:latest` and run the container.
-4. (Sanity) `docker compose up -d` still works if you kept Week 2 compose files.
+Week 3 adds `.github/workflows/` — you are not re-proving Docker from scratch, but the grader **does** run `docker build` and `docker compose config` on your submission.
 
 ---
 
-## Prerequisites (Week 2)
+## Required pipeline (tough checklist)
 
-Your repo should **already** have from Week 2 (not re-graded in depth, but must exist):
+Your `.github/workflows/` must include **all** of the following:
 
-| Item | Required |
-|------|----------|
-| `Dockerfile` | Builds your app image |
-| `compose.yaml` | Multi-service stack (app + DB + cache, etc.) |
-| App runs locally | `docker compose up --build` succeeds |
-
-Week 3 adds **CI/CD on top** — you are not submitting Docker learning again.
-
----
-
-## Default project — Production-Grade CI Pipeline
-
-Take your **Week 2 containerized app** and add a complete GitHub Actions pipeline.
-
-### Required pipeline features (all 9)
-
-| # | Feature | Tool |
-|---|---------|------|
-| 1 | **Lint** | ESLint / Flake8 / golangci-lint |
-| 2 | **Test** + coverage artifact | pytest / Jest / go test |
-| 3 | **JSON-schema contract test** | `jsonschema` / `ajv` |
+| # | Requirement | Tool / pattern |
+|---|-------------|----------------|
+| 1 | **Lint** job | Flake8 / ESLint / golangci-lint |
+| 2 | **Test** job + coverage artifact or report | pytest / Jest + `actions/upload-artifact` or codecov |
+| 3 | **JSON-schema contract test** | `jsonschema` / `ajv` — fails on API shape break |
 | 4 | **Secret scan** | TruffleHog or gitleaks |
-| 5 | **Dependency scan** | `pip-audit` / `npm audit` / `govulncheck` |
-| 6 | **Build & push** to GHCR (`latest` + commit SHA) | `docker/build-push-action` |
-| 7 | **Auto-tag releases** on merge to `main` | `semantic-release` or `release-please` |
-| 8 | **Matrix build** — ≥ 2 language/runtime versions | matrix strategy |
-| 9 | **File-size guard** — fail if any file > 1 MB | custom step |
+| 5 | **Dependency scan** | `pip-audit` / `npm audit` / `dependency-review` |
+| 6 | **Trivy** image scan | `aquasecurity/trivy-action` — fail on HIGH/CRITICAL |
+| 7 | **Build & push** to **public GHCR** | `docker/build-push-action` — `latest` + commit SHA tags |
+| 8 | **`needs:` gating** | `build-push` only runs after lint + test pass |
+| 9 | **Matrix build** | ≥2 runtime versions (e.g. Python 3.11 + 3.12) |
+| 10 | **Reusable workflow** OR **composite action** | `workflow_call` or `.github/actions/...` |
+| 11 | **File-size guard** | CI fails if any tracked file > 1 MB |
+| 12 | **Coverage ≥ 70%** threshold in CI | fail below threshold |
+| 13 | All workflows pass **`actionlint`** | no `ubntu-latest` typos |
 
-Also required:
+Also required on GitHub (checked via API, **+30 pts**):
 
-- **Trivy** scan in CI — fail on HIGH/CRITICAL (image built in pipeline)
-- **Syft SBOM** uploaded as CI artifact or Release asset
-- **Reusable workflow** (`workflow_call`) or **composite action**
-- **Branch protection** on `main` requiring status checks
-- **Two failure screenshots** — one schema break, one secret-scan break (proves gates work)
-
----
-
-## Scoring overview (100 pts)
-
-| Part | Focus | Points |
-|------|-------|--------|
-| **A** | Quality gates (lint, test, schema, secrets) | 25 |
-| **B** | Security in CI (dependency scan, Trivy, SBOM) | 15 |
-| **C** | GHCR build & push | 25 |
-| **D** | Pipeline engineering | 20 |
-| **E** | Documentation & proof | 15 |
-| | **Total** | **100** |
-
-**Auto-fail:** verified secret in Git history; image pushed when a quality gate failed; GHCR package private.
-
-Partial credit per criterion below.
+- Latest **completed** Actions run on `main` has conclusion **`success`**
+- GHCR package is **public** (mentor spot-check; not auto-graded yet)
 
 ---
 
-## Part A — Quality gates (25 pts)
+## How autograding works (two layers)
 
-| Criterion | Pts | Pass condition |
-|-----------|-----|----------------|
-| Lint job | 6 | Runs on PR + push; fails on style violations |
-| Test job | 7 | Runs tests; uploads coverage artifact |
-| JSON-schema contract test | 6 | Fails when API response shape changes |
-| Secret scan | 6 | TruffleHog/gitleaks on PR; fails on verified secret |
+| Layer | What | Points |
+|-------|------|--------|
+| **1 — Codebase (sandbox)** | Clone your repo → `actionlint`, workflow structure, **`docker build`**, **`docker compose config`**, run tests locally in grader | **240** |
+| **2 — Live GitHub** | GitHub API: Actions run for **your submitted commit**, jobs (lint/test/build) **actually passed**, GHCR package exists | **+30** |
+| **3 — AI docs** | README explains pipeline stages | **+30** |
+
+We **cannot** push to your repo on your behalf. “Live” means: after **you** push, we verify GitHub Actions really ran and passed for the **exact commit** you submitted.
+
+### Optional fine-grained PAT (recommended)
+
+On the submission form, paste a **read-only** fine-grained token scoped to **this repo only**:
+
+- Actions: read
+- Contents: read  
+- Metadata: read
+- Packages: read (for GHCR check)
+
+Required for **private** repos. For **public** repos the server token may work, but a PAT gives reliable Actions + Packages access.
+
+Token is encrypted, used only during grading, then removed from our database.
+
+### Live checks (+30 breakdown)
+
+| Check | Pts |
+|-------|-----|
+| Completed Actions run for submitted commit = `success` | +12 |
+| lint + test + build jobs all green on that run | +10 |
+| GHCR package `ghcr.io/you/repo` exists | +8 |
+
+## Scoring (300 points)
+
+| Part | Pts | Autograded? |
+|------|-----|-------------|
+| Workflows valid (`actionlint`, jobs present) | 60 | ✅ |
+| Quality gates (lint, test, schema, secrets, deps, Trivy) | 90 | ✅ |
+| Engineering (matrix, reusable, file-size guard, `needs:`) | 60 | ✅ |
+| Docker live (`docker build`, compose ≥2 services + healthcheck, pytest) | 30 | ✅ |
+| **Green Actions run on `main`** | 30 | ✅ GitHub API |
+| **README / pipeline documentation** | 30 | ✅ AI rubric |
+| **Total** | **300** | |
+
+Partial credit per criterion. Resubmit anytime before the deadline — best score counts.
 
 ---
 
-## Part B — Security in CI (15 pts)
+## Deployment — do you need it?
 
-| Criterion | Pts | Pass condition |
-|-----------|-----|----------------|
-| Dependency scan | 5 | `pip-audit` / `npm audit` / govulncheck in workflow |
-| Trivy image scan | 5 | Fails CI on HIGH/CRITICAL (`ignore-unfixed` OK) |
-| SBOM artifact | 5 | Syft output in Actions artifacts or Releases |
+| | Required? |
+|---|-----------|
+| GHCR image pushed from CI | **Yes** |
+| `docker compose up` works locally | **Yes** (grader checks config) |
+| Deploy to VM / Fly / Cloudflare / K8s | **No** — optional portfolio stretch |
+| Public URL after deploy | **No** — optional **+30 manual bonus** if you add a deploy job |
 
----
-
-## Part C — GHCR build & push (25 pts)
-
-| Criterion | Pts | Pass condition |
-|-----------|-----|----------------|
-| Builds Docker image in CI | 8 | Uses Week 2 `Dockerfile` via build-push action |
-| Pushes to public GHCR | 8 | `ghcr.io/<you>/<repo>:latest` + `:sha-*` exist |
-| Gated by quality jobs | 6 | `build-push` has `needs:` on lint/test/schema/secret — skipped on red |
-| Image pullable | 3 | README or mentor can `docker pull` and run |
-
----
-
-## Part D — Pipeline engineering (20 pts)
-
-| Criterion | Pts | Pass condition |
-|-----------|-----|----------------|
-| Matrix build | 5 | ≥ 2 versions (e.g. Python 3.11 + 3.12) |
-| Reusable workflow or composite action | 5 | `workflow_call` or `.github/actions/...` |
-| File-size guard | 4 | CI fails if any tracked file > 1 MB |
-| Auto releases | 6 | semantic-release or release-please creates/tags on `main` |
-
----
-
-## Part E — Documentation & proof (15 pts)
-
-| Criterion | Pts | Pass condition |
-|-----------|-----|----------------|
-| README — pipeline docs | 5 | Explains each stage; links to Actions + GHCR |
-| Branch protection | 3 | Screenshot or settings showing required checks |
-| Green pipeline screenshot | 3 | Latest `main` run all green |
-| Failure proof | 4 | Screenshots: schema gate failed + secret gate failed |
+You learn deployment properly in **Week 4 (Kubernetes)**. Week 3 stops at **build + push + prove gates work**.
 
 ---
 
 ## Required repo layout
 
 ```
-your-week3-repo/                    ← same repo as Week 2 Docker project
-├── README.md                       # pipeline docs + GHCR pull instructions
-├── Dockerfile                      # from Week 2
-├── compose.yaml                    # from Week 2
+your-repo/
+├── README.md                 # explain every pipeline stage + GHCR pull instructions
+├── Dockerfile
+├── compose.yaml
 ├── .dockerignore
-├── src/                            # or app/
+├── src/  or  app/
 ├── tests/
 │   ├── test_unit.py
-│   ├── test_schema.py
-│   └── *.schema.json
-├── requirements.txt                # or package.json
+│   └── test_schema.py
 └── .github/
     ├── workflows/
-    │   ├── ci.yml                  # main pipeline
-    │   └── reusable-build-push.yml # optional reusable workflow
-    └── actions/                    # optional composite action
+    │   ├── ci.yml
+    │   └── reusable-build.yml   # optional workflow_call
+    └── actions/                 # OR composite action here
 ```
-
----
-
-## How to submit
-
-1. Push final code to `main` on a **public** repo.
-2. Confirm latest Actions run on `main` is **green**.
-3. Confirm GHCR package visibility is **public** (Packages → Package settings).
-4. Go to **[csot-devops.devclub.in/submission](https://csot-devops.devclub.in/submission)** → **Week 3**.
-5. Submit:
-   - GitHub repo URL
-   - Link to latest green Actions run on `main`
-   - GHCR image URL (`ghcr.io/...`)
-
-Grading: 3–5 business days. Disputes → `#devops-help` with repo link + part ID.
 
 ---
 
 ## Submission checklist
 
-- [ ] Public GitHub repo (Week 2 Docker app + Week 3 CI)
-- [ ] All 9 pipeline features working
-- [ ] Trivy + Syft in CI
-- [ ] Reusable workflow or composite action
-- [ ] Branch protection on `main`
-- [ ] GHCR public with `latest` + SHA tags
-- [ ] `build-push` skipped when a gate fails (screenshot)
-- [ ] Schema + secret scan failure screenshots
-- [ ] Green `main` pipeline screenshot
-- [ ] `trufflehog git file://. --only-verified` clean
-- [ ] Portal submitted before deadline
-
----
-
-## Alternative project ideas
-
-Same **100-point rubric** — pipeline must still lint, test, scan, and push a container image to GHCR. Get mentor approval if scope differs.
-
-| # | Idea |
-|---|------|
-| 1 | **PR bot** — Action comments lint/coverage diff on every PR |
-| 2 | **Release-notes generator** — conventional commits → CHANGELOG + GitHub Release |
-| 3 | **CI template pack** — reusable workflows for Node/Python/Go |
-| 4 | **Integration test job** — CI runs `docker compose up` + hits API endpoints |
-| 5 | **LLM eval pipeline** — schema-validate API responses from your app |
-
-Full list: [CI/CD doc § alternatives](./content/week-02-cicd-quality-registries.md#alternative-mini-project-ideas).
-
----
-
-## Optional cloud bonus (+10 pts)
-
-Outside the 100-point base. Add a **deploy** stage after GHCR push.
-
-| Criterion | Pts |
-|-----------|-----|
-| Deploy job updates a running app (SSH, Fly.io, or Cloudflare Pages) | 4 |
-| Image pinned by commit SHA (not `latest`) | 2 |
-| GitHub Environment with manual approval for production | 2 |
-| Public URL works after deploy | 2 |
-
-Examples: [CI/CD Part B — Cloud Track](./content/week-02-cicd-quality-registries.md#-part-b--cloud-track-optional-bonus-10-pts).
+- [ ] Public GitHub repo (Week 2 app + Week 3 CI)
+- [ ] All 13 pipeline requirements above
+- [ ] Latest Actions run on `main` is **green**
+- [ ] GHCR package **public** with `latest` + SHA tags
+- [ ] `build-push` has `needs:` on quality jobs — skipped when a gate fails
+- [ ] README documents each stage + links to Actions + GHCR
+- [ ] Submitted on portal before deadline
+- [ ] After pushing fixes, click **Update submission** to re-grade
 
 ---
 
 ## Common failures
 
-| Mistake | Cost |
-|---------|------|
-| `build-push` runs without `needs:` on gates | Part C −6 |
-| GHCR package left private | Part C −8 |
-| No failure screenshots | Part E −4 |
-| No branch protection | Part E −3 |
-| Matrix job only on one version | Part D −5 |
-| Pushing on red (demo secret still in branch) | **Auto-fail** |
-| Secret in Git history | **0/100** |
-
----
-
-## Self-check before submit
-
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-echo "=== Week 3 CI pre-submit ==="
-test -f Dockerfile && echo "✓ Dockerfile (Week 2)"
-test -f compose.yaml && echo "✓ compose.yaml (Week 2)"
-test -d .github/workflows && echo "✓ workflows dir"
-ls .github/workflows/
-
-echo "Manual checks:"
-echo "  1. Open Actions → latest main run → all green"
-echo "  2. build-push has needs: [lint, test, ...]"
-echo "  3. ghcr.io/<you>/<repo> public + pullable"
-echo "  4. Branch protection requires status checks"
-echo "  5. Failure screenshots in README or DEMO.md"
-trufflehog git file://. --only-verified 2>/dev/null | tail -3 || true
-```
+| Mistake | Effect |
+|---------|--------|
+| `build-push` runs without `needs:` on gates | −9 to −15 |
+| No Trivy / secret scan / schema test | −6 each |
+| Private GHCR package | Actions +30 may pass but mentor may dock |
+| Only one compose service | −9 |
+| No healthcheck in compose | −6 |
+| Workflows fail `actionlint` | −9 to −15 |
+| No green Actions run on `main` | **−30** (bonus not awarded) |
+| Thin README | **−30** (AI docs score) |
 
 ---
 
 ## Program arc
 
 ```text
-Week 1  →  DevOps Toolkit (scripts, systemd, nginx)
 Week 2  →  Dockerized app (Dockerfile, compose)       ✓ prerequisite
-Week 3  →  THIS SUBMISSION (CI pipeline + GHCR)     ← you are here
+Week 3  →  THIS SUBMISSION (CI pipeline + GHCR)       ← you are here
 Week 4  →  Deploy GHCR image to Kubernetes
 ```
 
----
-
-*Spec version: 2026 cohort · Questions: `#devops-help`*
+*Questions: `#devops-help` · Spec version: 2026 cohort*
