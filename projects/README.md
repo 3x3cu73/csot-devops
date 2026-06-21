@@ -19,8 +19,7 @@ Two different things land each week — don't confuse them:
 |---|---|---|---|
 | 1 | DevOps Toolkit Repo (Build 1 + Build 2 + scripts) | 50 | [`projects/week-01/README.md`](./week-01/README.md) |
 | 2 | Dockerized App Stack (multi-service `docker compose`) | 50 | [`projects/week-02/README.md`](./week-02/README.md) |
-| 2 | *coming soon* | — | — |
-| 3 | *coming soon* | — | — |
+| 3 | Production-Grade CI Pipeline + GHCR | 100 | [`week-03-projects.md`](../week-03-projects.md) |
 | 4 | *coming soon* | — | — |
 | 5 | *coming soon* | — | — |
 | 6 | Capstone | — | — |

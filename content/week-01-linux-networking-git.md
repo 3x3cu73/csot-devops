@@ -4,7 +4,7 @@
 >
 > **Time Budget**: ~8 hours (reading 3h + builds 3h + mini-project 2h)
 
-This file is **Week 1 of the CSOT DevOps weekly curriculum**. The full six-week syllabus lives in the repo root **[README.md](../README.md)** under *The 6 Weeks* — each week has its own guide under `**[content/](../content/)`** (this file, then Week 2–6).
+This file is **Week 1 of the CSOT DevOps weekly curriculum**. The full six-week syllabus lives in the repo root **[README.md](../README.md)** under *The 6 Weeks* — each week has its own guide under **[`content/`](../content/)** (this file, then Week 2–6).
 
 ---
 
@@ -13,7 +13,7 @@ This file is **Week 1 of the CSOT DevOps weekly curriculum**. The full six-week 
 1. [Tools & Software Used](#tools--software-used)
 2. [Prerequisites & Setup](#prerequisites--setup)
 3. [Learning Outcomes](#learning-outcomes)
-4. **[Week 1 Contest — mandatory (100 pts)](#week-1-contest--mandatory-100-points)**
+4. [**Week 1 Contest — mandatory (100 pts)**](#week-1-contest--mandatory-100-points)
 5. [Module 0 — DevOps & System Design Primer](#module-0--devops--system-design-primer)
 6. [Module 1 — Linux Essentials](#module-1--linux-essentials)
 7. [Module 2 — Shell Scripting & Automation](#module-2--shell-scripting--automation)
@@ -36,26 +36,22 @@ This file is **Week 1 of the CSOT DevOps weekly curriculum**. The full six-week 
 
 This week's toolbox.
 
-
-> **Mac & Windows users:** you'll be running every tool **inside an Ubuntu VM** — multipass (Mac) or WSL2 (Windows). So the only thing you install on your host OS is multipass/WSL itself; everything else uses the same `sudo apt install …` as Linux. See **[Prerequisites & Setup](#prerequisites--setup)** below for the one-time setup.
-
-| Tool                | Purpose                        | Install (Linux / inside WSL2 / inside multipass) |
-| ------------------- | ------------------------------ | ------------------------------------------------ |
-| **Ubuntu shell**    | The OS we live in              | Linux: already there. Windows: `wsl --install -d Ubuntu` (PowerShell as admin). macOS: `brew install --cask multipass && multipass launch --name dev` |
-| **bash**            | Default shell                  | Built-in                                         |
-| **git**             | Version control                | `sudo apt install git`                           |
-| **gh** (GitHub CLI) | Auth + PRs from terminal       | `sudo apt install gh`                            |
-| **tmux**            | Persistent terminal sessions   | `sudo apt install tmux`                          |
-| **systemd**         | Service manager                | Built-in on modern distros                       |
-| **nginx**           | Web server / reverse proxy     | `sudo apt install nginx`                         |
-| **certbot**         | Let's Encrypt TLS certificates | `sudo apt install certbot python3-certbot-nginx` |
-| **curl, wget**      | HTTP clients                   | Pre-installed                                    |
-| **dig, nslookup**   | DNS lookup                     | `sudo apt install dnsutils`                      |
-| **ss, netstat**     | Socket inspection              | Pre-installed (`ss`); `sudo apt install net-tools` for `netstat` |
-| **htop**            | Better `top`                   | `sudo apt install htop`                          |
-| **jq**              | JSON processor                 | `sudo apt install jq`                            |
-| **trufflehog**      | Secret scanner                 | See [Module 7](#module-7--secrets-hygiene)       |
-
+| Tool | Purpose | Install (Linux/WSL) | Install (Mac) | Install (Windows) |
+|------|---------|--------------------|--------------|-------------------|
+| **Linux / WSL2** | The OS we live in | Already on Ubuntu/Kali/Debian | macOS is Unix-like; skip | `wsl --install -d Ubuntu` (PowerShell as admin) |
+| **bash** | Default shell | Built-in | Built-in | Inside WSL |
+| **git** | Version control | `sudo apt install git` | `brew install git` | Git for Windows + Git Bash, or use WSL |
+| **gh** (GitHub CLI) | Auth + PRs from terminal | `sudo apt install gh` | `brew install gh` | `winget install GitHub.cli` |
+| **tmux** | Persistent terminal sessions | `sudo apt install tmux` | `brew install tmux` | Inside WSL |
+| **systemd** | Service manager | Built-in on modern distros | N/A (use launchd) | Inside WSL |
+| **nginx** | Web server / reverse proxy | `sudo apt install nginx` | `brew install nginx` | Inside WSL |
+| **certbot** | Let's Encrypt TLS certificates | `sudo apt install certbot python3-certbot-nginx` | `brew install certbot` | Inside WSL |
+| **curl, wget** | HTTP clients | Pre-installed | Pre-installed | Inside WSL |
+| **dig, nslookup** | DNS lookup | `sudo apt install dnsutils` | Pre-installed (`bind`) | Inside WSL |
+| **ss, netstat** | Socket inspection | Pre-installed | `netstat` only | Inside WSL |
+| **htop** | Better `top` | `sudo apt install htop` | `brew install htop` | Inside WSL |
+| **jq** | JSON processor | `sudo apt install jq` | `brew install jq` | Inside WSL |
+| **trufflehog** | Secret scanner | See [Module 7](#module-7--secrets-hygiene) | `brew install trufflehog` | `pip install truffleHog` |
 
 **Verification command** (run after installing everything):
 
@@ -85,57 +81,16 @@ Expected output:
 
 ## Prerequisites & Setup
 
-- A Linux shell environment: (Any one)
-  - 1. **Linux** — you are good to go.
-  - 1. **Windows** — install WSL2 (Ubuntu): [https://youtu.be/J8cy6MDkacI?si=XP1w5gTWI820eoQ_](https://youtu.be/J8cy6MDkacI?si=XP1w5gTWI820eoQ_). Run **all** snippets inside the WSL terminal, not PowerShell/CMD.
-  - 1. **macOS** — install **multipass** (the "WSL of macOS" — a free, CLI-only Ubuntu VM from Canonical). See the **macOS setup** below. Run **all** snippets inside the multipass shell, not the host macOS terminal.
-  - 1. **Free-tier cloud compute** (Azure $100 student credits, AWS free tier, GCP $300 credits, Oracle Always Free) — SSH into an Ubuntu VM and treat it like Linux.
-- 4 GB RAM minimum
+- A Linux box: native install, WSL2, or a cheap cloud VM (Oracle Free-tier ARM is great)
+- 4 GB RAM minimum, 8 GB recommended
 - A GitHub account (free)
-- Cloudflare Account
-- (Optional) A domain name for Build 2's HTTPS — `.tech`  Free with github education on [https://get.tech/github-student-developer-pack](https://get.tech/github-student-developer-pack)
-
-### macOS setup (one-time, ~5 minutes)
-
-macOS is Unix but **not Linux** — it doesn't ship `systemd`, uses BSD versions of `sed`/`netstat`/`find`, and has no `apt`. Rather than fight that for the whole week, we run the entire curriculum inside an Ubuntu VM via **multipass** — Canonical's official, free, CLI-only Ubuntu-on-Mac tool. Think of it as **WSL for macOS**. This way every `apt install …`, every `systemctl` command, every snippet in this guide works **exactly as written** — same as Linux/WSL2 users.
-
-```bash
-brew install --cask multipass            # one-time install (need Homebrew: https://brew.sh)
-
-multipass launch --name dev --cpus 2 --memory 4G --disk 20G   # one-time: spin up Ubuntu LTS
-
-multipass shell dev                      # drop into the Ubuntu VM — your daily entry point
-# you are now in Ubuntu: `sudo apt update`, `systemctl ...`, everything works
-exit                                     # back to macOS terminal
-
-# day-to-day
-multipass stop dev                       # shut it down when done
-multipass start dev                      # resume next time
-multipass list                           # see your VMs and their IPs
-```
-
-Useful extras:
-
-- **Share a folder from your Mac into the VM** (so you can edit code in your Mac editor and run it in Ubuntu):
-
-  ```bash
-  multipass mount ~/code dev:/home/ubuntu/code
-  ```
-
-- **Get the VM's IP** (for testing nginx from your Mac browser in Build 2):
-
-  ```bash
-  multipass info dev | grep IPv4
-  ```
-
-**Rule of thumb for Mac users:** every code snippet in this week's modules runs inside `multipass shell dev`. The only thing you do on the host macOS terminal is `multipass shell dev` / `multipass start dev` / `multipass stop dev`.
+- (Optional) A domain name for Build 2's HTTPS — `.xyz` and `.tk` domains are dirt cheap; you can also use Cloudflare's free subdomains via Tunnels or Free domain thorugh github education (Dot Tech )
 
 ---
 
 ## Learning Outcomes
 
 By the end of this week, you can:
-
 - Navigate Linux confidently; read and set file permissions; manage processes
 - Write idiomatic shell scripts with proper error handling
 - Use `systemd` to run long-lived services; use `tmux` for persistent SSH sessions
@@ -148,17 +103,17 @@ By the end of this week, you can:
 
 ## Week 1 Contest — mandatory (100 points)
 
-> **This contest is mandatory for every Week 1 participant.** It runs for the **whole week** . It is worth **100 points** on the cohort leaderboard and is graded automatically on **[csot-devops.devclub.in](https://csot-devops.devclub.in)**.
+> **This contest is mandatory for every Week 1 participant.** It runs for the **whole week** (submit any time while the window is open — not a one-night sprint). It is worth **100 points** on the cohort leaderboard and is graded automatically on **[csot-devops.devclub.in](https://csot-devops.devclub.in)**.
 
+| | |
+|---|---|
+| **Platform** | [csot-devops.devclub.in](https://csot-devops.devclub.in) — sign in with DevClub |
+| **Tasks** | 12 shell/sysadmin challenges (see [task index](https://csot-devops.devclub.in/contest/week-01)) |
+| **Points** | **100 total** (7–10 pts per task; partial credit on many tasks) |
+| **When** | Open **all week** — check the site for the exact open/close times for your cohort |
+| **How** | `csot` CLI — install once, `csot login`, then `csot submit ./solutions` (whole folder or `-t NN` per task) |
 
-|              |                                                                                                            |
-| ------------ | ---------------------------------------------------------------------------------------------------------- |
-| **Platform** | [csot-devops.devclub.in](https://csot-devops.devclub.in) — sign in with DevClub                            |
-| **Tasks**    | 12 shell/sysadmin challenges (see [task index](https://csot-devops.devclub.in/contest/week-01))            |
-| **Points**   | **100 total** (7–10 pts per task; partial credit on many tasks)                                            |
-| **When**     | Open **all week** — check the site for the exact open/close times for your cohort                          |
-| **How**      | `csot` CLI — install once, `csot login`, then `csot submit ./solutions` (whole folder or `-t NN` per task) |
-
+**Scoring in one line:** your score = **sum of your best mark on each task**; penalties only break ties (they do not reduce points). Leaderboard: [csot-devops.devclub.in/leaderboard](https://csot-devops.devclub.in/leaderboard).
 
 Plan time alongside the modules below — several contest tasks map directly to Module 2 (shell), Module 3 (systemd), and Module 5 (nginx/TLS).
 
@@ -180,7 +135,6 @@ Full task list, skeleton examples, visible/hidden grader rules, and tie-break de
 DevOps is the cultural and technical practice of bringing **Dev** (people who build) and **Ops** (people who keep things running) together. The goal: ship software faster *and* more reliably.
 
 The acronym **CALMS** captures the pillars:
-
 - **C**ulture: collaboration over silos
 - **A**utomation: humans don't do repetitive tasks; machines do
 - **L**ean: small batches, fast feedback
@@ -200,10 +154,9 @@ The acronym **CALMS** captures the pillars:
 ```
 
 Every box in this picture is a problem we'll solve this program:
-
 - Week 1: the OS those services run on
-- Week 2: CODE → BUILD → TEST automation (CI/CD)
-- Week 3: BUILD (containers)
+- Week 2: BUILD (containers / Docker)
+- Week 3: CODE → BUILD → TEST automation (CI/CD, GHCR)
 - Week 4: SHIP (Kubernetes)
 - Week 5: SHIP infrastructure too (Terraform)
 - Week 6: MONITOR (Prometheus + Grafana)
@@ -213,23 +166,19 @@ Every box in this picture is a problem we'll solve this program:
 Before we automate, you need to know what you're automating.
 
 **Monolith vs Microservices:**
-
 - **Monolith**: one big codebase, deployed as one unit. Simple to start. Hard to scale individual parts.
 - **Microservices**: many small services that talk over the network. Scales well. Operationally complex (this is why DevOps exists).
 
 **Scalability:**
-
 - **Vertical** (scale up): bigger server. Hits a wall fast.
 - **Horizontal** (scale out): more servers. Requires stateless apps + a load balancer.
 
 **Load Balancing — L4 vs L7:**
-
 - **L4** (TCP/UDP): fast, dumb. Knows IPs and ports. Used in front of databases, raw TCP.
 - **L7** (HTTP): smart. Knows URLs, headers, cookies. Used in front of web apps. nginx (Module 5) is L7.
 
 **Reverse Proxy:**
 A server that sits in front of your real backend and forwards requests to it. The client never talks to the backend directly. This gives you:
-
 - TLS termination (HTTPS at the edge)
 - Load balancing
 - Caching
@@ -242,7 +191,6 @@ A reverse proxy + extras (auth, rate limiting, request transformation). Same ide
 Reverse proxies *inside* the cluster, between every service. Istio / Linkerd. Don't worry about this for now.
 
 ### Going Deeper
-
 - *The Phoenix Project* by Gene Kim — the novel that explains DevOps culture
 - *Designing Data-Intensive Applications* by Martin Kleppmann — Ch 1 for system design fundamentals
 - [12-Factor App](https://12factor.net/) — the canonical "how to build cloud-friendly apps" doc
@@ -272,7 +220,6 @@ Reverse proxies *inside* the cluster, between every service. Istio / Linkerd. Do
 ```
 
 **Key paths to remember:**
-
 - `/etc/nginx/` — nginx config
 - `/etc/systemd/system/` — your custom systemd units
 - `/var/log/` — system and app logs
@@ -292,7 +239,6 @@ ls -l /etc/passwd
 ```
 
 Numeric form (each triplet is a number 0-7):
-
 - `r` = 4, `w` = 2, `x` = 1
 - `rwx` = 7, `rw-` = 6, `r--` = 4
 
@@ -328,21 +274,18 @@ ps -p $$
 
 ### Package Managers
 
-
-| Distro                 | Manager  | Install                | Search            | Update                                |
-| ---------------------- | -------- | ---------------------- | ----------------- | ------------------------------------- |
-| Ubuntu / Debian / Kali | `apt`    | `sudo apt install pkg` | `apt search pkg`  | `sudo apt update && sudo apt upgrade` |
-| Fedora / RHEL          | `dnf`    | `sudo dnf install pkg` | `dnf search pkg`  | `sudo dnf upgrade`                    |
-| Arch                   | `pacman` | `sudo pacman -S pkg`   | `pacman -Ss pkg`  | `sudo pacman -Syu`                    |
-| macOS                  | `brew`   | `brew install pkg`     | `brew search pkg` | `brew upgrade`                        |
-
+| Distro | Manager | Install | Search | Update |
+|---|---|---|---|---|
+| Ubuntu / Debian / Kali | `apt` | `sudo apt install pkg` | `apt search pkg` | `sudo apt update && sudo apt upgrade` |
+| Fedora / RHEL | `dnf` | `sudo dnf install pkg` | `dnf search pkg` | `sudo dnf upgrade` |
+| Arch | `pacman` | `sudo pacman -S pkg` | `pacman -Ss pkg` | `sudo pacman -Syu` |
+| macOS | `brew` | `brew install pkg` | `brew search pkg` | `brew upgrade` |
 
 ### Text Manipulation: The Magic Five
 
 These are the bread-and-butter of every shell script:
 
-`**grep**` — search for patterns:
-
+**`grep`** — search for patterns:
 ```bash
 grep "ERROR" /var/log/syslog
 grep -i "error" /var/log/syslog        # case insensitive
@@ -351,8 +294,7 @@ grep -v "DEBUG" app.log                # invert (lines NOT matching)
 grep -c "200" access.log               # count matches
 ```
 
-`**awk**` — column-based processing:
-
+**`awk`** — column-based processing:
 ```bash
 # Print the 1st column of /etc/passwd (separated by ':')
 awk -F: '{print $1}' /etc/passwd
@@ -366,23 +308,20 @@ echo -e "10\n20\n30" | awk '{sum+=$1} END {print sum}'
 # 60
 ```
 
-`**sed**` — stream editor:
-
+**`sed`** — stream editor:
 ```bash
 sed 's/foo/bar/g' file.txt             # replace all foo with bar
 sed -i 's/foo/bar/g' file.txt          # edit in place
 sed -n '5,10p' file.txt                # print lines 5-10
 ```
 
-`**cut**` — extract columns:
-
+**`cut`** — extract columns:
 ```bash
 cut -d: -f1 /etc/passwd                # 1st field, : delimiter
 echo "hello world" | cut -c1-5         # first 5 characters
 ```
 
-`**sort | uniq -c | sort -rn**` — the classic top-N pattern:
-
+**`sort | uniq -c | sort -rn`** — the classic top-N pattern:
 ```bash
 # Top 5 most-frequent IPs in an nginx access log
 awk '{print $1}' access.log | sort | uniq -c | sort -rn | head -5
@@ -448,7 +387,6 @@ chmod +x hello.sh
 ```
 
 Output:
-
 ```
 Hello, World #1!
 Hello, World #2!
@@ -527,7 +465,6 @@ done
 ```
 
 Run:
-
 ```bash
 ./greet.sh -v -n Sumit -c 3
 # DEBUG: name=Sumit count=3
@@ -573,27 +510,24 @@ crontab -e         # edit your cron table
 0 9 * * 1 /home/sumit/scripts/weekly-report.sh
 ```
 
-For better scheduling (and logging), use `**systemd` timers** (next module).
+For better scheduling (and logging), use **`systemd` timers** (next module).
 
 ### The 12-Factor App: Config
 
 > Store config in the environment, not in code.
 
 **Bad** (hardcoded):
-
 ```python
 db_url = "postgres://user:secretpassword@localhost/mydb"
 ```
 
 **Good** (from environment):
-
 ```python
 import os
 db_url = os.environ["DATABASE_URL"]
 ```
 
 In Bash:
-
 ```bash
 : "${DATABASE_URL:?DATABASE_URL must be set}"
 echo "Connecting to $DATABASE_URL"
@@ -610,9 +544,8 @@ If `DATABASE_URL` is unset, this dies immediately with a helpful error.
 You SSH into a server, start a process, close your laptop → process dies. Bad.
 
 Two solutions:
-
-1. `**tmux**` — for interactive sessions you want to resume
-2. `**systemd**` — for production services that should restart on crash and boot
+1. **`tmux`** — for interactive sessions you want to resume
+2. **`systemd`** — for production services that should restart on crash and boot
 
 ### tmux: Persistent Terminal Sessions
 
@@ -630,17 +563,15 @@ tmux kill-session -t work
 
 **Essential keybindings** (prefix is `Ctrl+b`):
 
-
-| Keybinding       | Action                 |
-| ---------------- | ---------------------- |
-| `Ctrl+b c`       | New window             |
+| Keybinding | Action |
+|---|---|
+| `Ctrl+b c` | New window |
 | `Ctrl+b n` / `p` | Next / previous window |
-| `Ctrl+b "`       | Split horizontally     |
-| `Ctrl+b %`       | Split vertically       |
-| `Ctrl+b arrow`   | Move between panes     |
-| `Ctrl+b d`       | Detach                 |
-| `Ctrl+b ?`       | Show all keybindings   |
-
+| `Ctrl+b "` | Split horizontally |
+| `Ctrl+b %` | Split vertically |
+| `Ctrl+b arrow` | Move between panes |
+| `Ctrl+b d` | Detach |
+| `Ctrl+b ?` | Show all keybindings |
 
 **Try it yourself:** SSH into a remote machine, run `tmux new -s test`, start `top`, detach with `Ctrl+b d`, log out, log back in, `tmux attach -t test`. Your `top` is still running.
 
@@ -687,16 +618,14 @@ EnvironmentFile=-/etc/myapp.env
 WantedBy=multi-user.target
 ```
 
-
-| Section     | Key                               | Meaning                                 |
-| ----------- | --------------------------------- | --------------------------------------- |
-| `[Unit]`    | `Description`                     | Human-readable name                     |
-| `[Unit]`    | `After=network.target`            | Wait until network is up                |
-| `[Service]` | `Type=simple`                     | Default: process stays in foreground    |
-| `[Service]` | `Restart=on-failure`              | Auto-restart on crash                   |
+| Section | Key | Meaning |
+|---|---|---|
+| `[Unit]` | `Description` | Human-readable name |
+| `[Unit]` | `After=network.target` | Wait until network is up |
+| `[Service]` | `Type=simple` | Default: process stays in foreground |
+| `[Service]` | `Restart=on-failure` | Auto-restart on crash |
 | `[Service]` | `EnvironmentFile=-/etc/myapp.env` | Load env vars (`-` = ignore if missing) |
-| `[Install]` | `WantedBy=multi-user.target`      | Start on boot at the "multi-user" stage |
-
+| `[Install]` | `WantedBy=multi-user.target` | Start on boot at the "multi-user" stage |
 
 #### Service Lifecycle Commands
 
@@ -756,7 +685,6 @@ systemctl list-timers
 ```
 
 Why timers over cron?
-
 - Native log integration (`journalctl`)
 - Better dependency handling
 - Run on boot if missed
@@ -768,39 +696,34 @@ Why timers over cron?
 
 ### TCP vs UDP
 
-
-|             | TCP                 | UDP                         |
-| ----------- | ------------------- | --------------------------- |
-| Connection  | Yes (handshake)     | No                          |
-| Reliability | Guarantees delivery | Best effort                 |
-| Order       | Preserved           | Not guaranteed              |
-| Speed       | Slower              | Faster                      |
-| Used for    | HTTP, SSH, DBs      | DNS, video streaming, games |
-
+| | TCP | UDP |
+|---|---|---|
+| Connection | Yes (handshake) | No |
+| Reliability | Guarantees delivery | Best effort |
+| Order | Preserved | Not guaranteed |
+| Speed | Slower | Faster |
+| Used for | HTTP, SSH, DBs | DNS, video streaming, games |
 
 ### Ports & Sockets
 
 A **port** is a 16-bit number (0–65535). A **socket** is `(IP, port, protocol)`.
 
-
-| Port      | Service          |
-| --------- | ---------------- |
-| 22        | SSH              |
-| 53        | DNS              |
-| 80        | HTTP             |
-| 443       | HTTPS            |
-| 3306      | MySQL            |
-| 5432      | Postgres         |
-| 6379      | Redis            |
+| Port | Service |
+|---|---|
+| 22 | SSH |
+| 53 | DNS |
+| 80 | HTTP |
+| 443 | HTTPS |
+| 3306 | MySQL |
+| 5432 | Postgres |
+| 6379 | Redis |
 | 8000–9000 | Common dev ports |
-
 
 Ports < 1024 are "privileged" — only root can bind to them.
 
 ### SSH & Key-Based Auth
 
 Generate a key pair:
-
 ```bash
 ssh-keygen -t ed25519 -C "your-email@example.com"
 # Press enter to accept default location (~/.ssh/id_ed25519)
@@ -808,19 +731,16 @@ ssh-keygen -t ed25519 -C "your-email@example.com"
 ```
 
 You now have two files:
-
 - `~/.ssh/id_ed25519` — **private key** (never share)
 - `~/.ssh/id_ed25519.pub` — **public key** (share freely)
 
 Copy your public key to a remote server:
-
 ```bash
 ssh-copy-id sumit@my-server.com
 # Or manually: append the .pub to ~/.ssh/authorized_keys on the server
 ```
 
 SSH config (`~/.ssh/config`) for convenience:
-
 ```
 Host myserver
     HostName 203.0.113.42
@@ -834,7 +754,6 @@ Now: `ssh myserver` just works.
 ### Diagnostic Tools
 
 #### `ping` — is the host reachable?
-
 ```bash
 ping -c 4 google.com
 # PING google.com (142.250.74.46) 56(84) bytes of data.
@@ -844,7 +763,6 @@ ping -c 4 google.com
 ```
 
 #### `curl` — make HTTP requests
-
 ```bash
 curl https://httpbin.org/get                          # GET
 curl -v https://example.com                           # verbose (show headers)
@@ -855,7 +773,6 @@ curl -I https://google.com                            # HEAD (just headers)
 ```
 
 #### `dig` — DNS lookups
-
 ```bash
 dig google.com
 # ;; ANSWER SECTION:
@@ -867,7 +784,6 @@ dig @1.1.1.1 google.com                    # query specific resolver
 ```
 
 #### `ss` — what's listening?
-
 ```bash
 sudo ss -tlnp                              # TCP, listening, numeric, with PID
 # State   Recv-Q  Send-Q   Local Address:Port     Process
@@ -876,7 +792,6 @@ sudo ss -tlnp                              # TCP, listening, numeric, with PID
 ```
 
 #### `traceroute` — the network path
-
 ```bash
 traceroute google.com
 ```
@@ -897,21 +812,18 @@ root DNS (.) → TLD DNS (com.) → authoritative DNS (example.com.)
 
 **Common record types:**
 
-
-| Type    | Purpose                                         | Example                                               |
-| ------- | ----------------------------------------------- | ----------------------------------------------------- |
-| `A`     | IPv4 address                                    | `example.com → 93.184.216.34`                         |
-| `AAAA`  | IPv6 address                                    | `example.com → 2606:2800:220:1::`                     |
-| `CNAME` | Alias to another name                           | `www.example.com → example.com`                       |
-| `MX`    | Mail server                                     | `example.com → mail.example.com priority 10`          |
-| `TXT`   | Arbitrary text (SPF, DKIM, domain verification) | `example.com → "v=spf1 include:_spf.google.com ~all"` |
-| `NS`    | Authoritative nameservers                       | `example.com → ns1.cloudflare.com`                    |
-
+| Type | Purpose | Example |
+|---|---|---|
+| `A` | IPv4 address | `example.com → 93.184.216.34` |
+| `AAAA` | IPv6 address | `example.com → 2606:2800:220:1::` |
+| `CNAME` | Alias to another name | `www.example.com → example.com` |
+| `MX` | Mail server | `example.com → mail.example.com priority 10` |
+| `TXT` | Arbitrary text (SPF, DKIM, domain verification) | `example.com → "v=spf1 include:_spf.google.com ~all"` |
+| `NS` | Authoritative nameservers | `example.com → ns1.cloudflare.com` |
 
 ### HTTP Basics
 
 Methods:
-
 - `GET` — fetch a resource
 - `POST` — create
 - `PUT` — replace
@@ -919,14 +831,12 @@ Methods:
 - `DELETE` — delete
 
 Status codes:
-
 - `2xx` — success (`200 OK`, `201 Created`, `204 No Content`)
 - `3xx` — redirect (`301 Moved Permanently`, `302 Found`)
 - `4xx` — client error (`400 Bad Request`, `401 Unauthorized`, `404 Not Found`)
 - `5xx` — server error (`500 Internal Server Error`, `502 Bad Gateway`, `503 Service Unavailable`)
 
 Headers:
-
 - `Content-Type: application/json`
 - `Authorization: Bearer <token>`
 - `User-Agent: Mozilla/5.0 ...`
@@ -955,7 +865,6 @@ Reverse Proxy (acts FOR server):
 ### nginx: The Workhorse
 
 Install:
-
 ```bash
 sudo apt install nginx
 sudo systemctl enable --now nginx
@@ -964,7 +873,6 @@ sudo systemctl status nginx
 ```
 
 Config structure:
-
 - `/etc/nginx/nginx.conf` — main config
 - `/etc/nginx/sites-available/` — your site configs (write here)
 - `/etc/nginx/sites-enabled/` — symlinks to active sites
@@ -988,7 +896,6 @@ server {
 ```
 
 Enable + reload:
-
 ```bash
 sudo ln -s /etc/nginx/sites-available/mysite /etc/nginx/sites-enabled/
 sudo nginx -t          # syntax check — ALWAYS do this before reload
@@ -1015,7 +922,6 @@ server {
 ```
 
 Reload and test:
-
 ```bash
 sudo nginx -t && sudo systemctl reload nginx
 curl http://api.example.com/health
@@ -1052,14 +958,12 @@ sudo certbot --nginx -d api.example.com
 ```
 
 Certbot will:
-
 1. Prove you own the domain (HTTP-01 challenge)
 2. Get a cert from Let's Encrypt
 3. **Modify your nginx config** to use it
 4. Set up auto-renewal via systemd timer
 
 Verify renewal works:
-
 ```bash
 sudo certbot renew --dry-run
 ```
@@ -1088,15 +992,13 @@ server {
 
 ### Apache (Brief Comparison)
 
-
-|              | nginx                          | Apache                     |
-| ------------ | ------------------------------ | -------------------------- |
-| Architecture | Event-driven (async)           | Process/thread per request |
-| Config       | One big tree                   | `.htaccess` per directory  |
-| Memory       | Lower                          | Higher                     |
-| Static files | Faster                         | Slower                     |
-| Used in      | Modern stacks, reverse proxies | Legacy stacks, PHP         |
-
+| | nginx | Apache |
+|---|---|---|
+| Architecture | Event-driven (async) | Process/thread per request |
+| Config | One big tree | `.htaccess` per directory |
+| Memory | Lower | Higher |
+| Static files | Faster | Slower |
+| Used in | Modern stacks, reverse proxies | Legacy stacks, PHP |
 
 Most modern deployments pick nginx. Apache is still huge in legacy enterprise + PHP shops.
 
@@ -1155,12 +1057,10 @@ git branch -D feature-x               # delete (force)
 ### Merge vs Rebase
 
 **Merge** creates a merge commit, preserves history:
-
 ```bash
 git checkout main
 git merge feature-x
 ```
-
 ```
 *   merge commit
 |\
@@ -1172,12 +1072,10 @@ git merge feature-x
 ```
 
 **Rebase** replays your commits on top of the target — linear history:
-
 ```bash
 git checkout feature-x
 git rebase main
 ```
-
 ```
 * feature commit 2 (replayed)
 * feature commit 1 (replayed)
@@ -1190,7 +1088,6 @@ git rebase main
 ### Resolving Conflicts
 
 When Git can't auto-merge, you get conflict markers:
-
 ```
 <<<<<<< HEAD
 their version
@@ -1200,14 +1097,12 @@ your version
 ```
 
 Edit the file, remove markers, then:
-
 ```bash
 git add file.txt
 git commit                # finishes the merge/rebase
 ```
 
 If you're rebasing and want to abort:
-
 ```bash
 git rebase --abort
 ```
@@ -1266,7 +1161,7 @@ gh pr create --title "Fix login redirect" --body "Fixes #42"
 
 ### Branching Strategies
 
-**Git Flow** — `main`, `develop`, `feature/`*, `release/`*, `hotfix/*`. Heavyweight. Used by big enterprise teams.
+**Git Flow** — `main`, `develop`, `feature/*`, `release/*`, `hotfix/*`. Heavyweight. Used by big enterprise teams.
 
 **GitHub Flow** — `main` is always deployable; feature branches off main; PR → merge → deploy. Simple. Used by most modern teams.
 
@@ -1287,7 +1182,6 @@ gh pr create --title "Fix login redirect" --body "Fixes #42"
 Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`.
 
 Examples:
-
 ```
 feat(auth): add Google OAuth login
 fix(api): handle null user in /profile
@@ -1333,7 +1227,6 @@ SECRET_KEY=generate-with-openssl-rand
 ```
 
 `.gitignore`:
-
 ```
 .env
 .env.local
@@ -1341,7 +1234,6 @@ SECRET_KEY=generate-with-openssl-rand
 ```
 
 Loading in Python:
-
 ```python
 from dotenv import load_dotenv
 import os
@@ -1351,14 +1243,12 @@ db_url = os.environ["DATABASE_URL"]
 ```
 
 Loading in Node:
-
 ```javascript
 require('dotenv').config();
 const dbUrl = process.env.DATABASE_URL;
 ```
 
 Loading in Bash:
-
 ```bash
 set -a; source .env; set +a
 ```
@@ -1366,7 +1256,6 @@ set -a; source .env; set +a
 ### TruffleHog: Scanning for Leaks
 
 Install:
-
 ```bash
 # Linux/Mac:
 curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh \
@@ -1377,20 +1266,17 @@ curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scr
 ```
 
 Scan a repo's full history (including deleted commits!):
-
 ```bash
 trufflehog git file://. --only-verified
 ```
 
 Sample output if clean:
-
 ```
 🐷🔑 TruffleHog. Unearth your secrets. 🔑🐷
 🐷 Scan completed.
 ```
 
 Sample output if leaked:
-
 ```
 Found verified result 🐷🔑
 Detector Type: AWS
@@ -1408,7 +1294,6 @@ pip install pre-commit
 ```
 
 Create `.pre-commit-config.yaml`:
-
 ```yaml
 repos:
   - repo: https://github.com/trufflesecurity/trufflehog
@@ -1422,7 +1307,6 @@ repos:
 ```
 
 Install:
-
 ```bash
 pre-commit install
 ```
@@ -1434,11 +1318,11 @@ Now every `git commit` runs the scanner first.
 1. **Rotate the secret immediately** (AWS console → delete key → make new one).
 2. **Don't `git rebase` and force-push** — the commit is in GitHub's caches; assume it's seen.
 3. **Use BFG Repo-Cleaner** to scrub history (optional, only for very embarrassing leaks):
-  ```bash
+   ```bash
    bfg --delete-files .env
    git reflog expire --expire=now --all && git gc --prune=now --aggressive
    git push --force
-  ```
+   ```
 4. **Audit access logs** for misuse.
 
 ---
@@ -1446,7 +1330,6 @@ Now every `git commit` runs the scanner first.
 ## Build 1 — System Health Monitor (Wed)
 
 ### Goal
-
 A shell script that captures system health (disk, memory, CPU, top processes, network interfaces), runs every 5 minutes via a `systemd` timer, and logs to `journalctl`.
 
 ### Step 1: Write the Script
@@ -1483,14 +1366,12 @@ echo "=== END $ts ==="
 ```
 
 Make it executable:
-
 ```bash
 chmod +x ~/scripts/healthmon.sh
 ~/scripts/healthmon.sh        # test it
 ```
 
 Expected output:
-
 ```
 === HEALTH CHECK 2026-05-25T10:30:00+05:30 ===
 [hostname] sumit-laptop
@@ -1557,7 +1438,6 @@ systemctl list-timers | grep healthmon
 ```
 
 Expected:
-
 ```
 NEXT                        LEFT     LAST    PASSED   UNIT             ACTIVATES
 Mon 2026-05-25 10:35:00 IST 3min ago 2min    healthmon.timer  healthmon.service
@@ -1572,7 +1452,6 @@ journalctl -u healthmon.service -f
 You'll see new output every 5 minutes. 
 
 ### ✅ Build 1 Complete When:
-
 - `~/scripts/healthmon.sh` is executable and produces sensible output
 - `healthmon.timer` is **active** (`systemctl status healthmon.timer`)
 - `journalctl -u healthmon.service` shows runs every 5 min
@@ -1583,7 +1462,6 @@ You'll see new output every 5 minutes.
 ## Build 2 — App Behind nginx with HTTPS (Fri)
 
 ### Goal
-
 Run a small web app under systemd, fronted by nginx as a reverse proxy on ports 80 and 443 with HTTPS.
 
 ### Step 1: A Tiny App
@@ -1616,7 +1494,6 @@ if __name__ == "__main__":
 ```
 
 Test:
-
 ```bash
 python3 ~/myapp/server.py &
 curl http://127.0.0.1:8000/hello
@@ -1680,7 +1557,6 @@ server {
 ```
 
 Enable + test:
-
 ```bash
 sudo ln -sf /etc/nginx/sites-available/myapp /etc/nginx/sites-enabled/myapp
 sudo nginx -t
@@ -1700,7 +1576,6 @@ sudo certbot --nginx -d api.yourdomain.com
 ```
 
 Verify:
-
 ```bash
 curl https://api.yourdomain.com/hello
 # {"service": "csot-demo", "path": "/hello", ...}
@@ -1727,7 +1602,6 @@ cloudflared tunnel run --url http://127.0.0.1:8000 csot-demo
 Cloudflare gives you free HTTPS, no certbot needed.
 
 ### ✅ Build 2 Complete When:
-
 - App runs under `systemd` (survives logout, restarts on crash)
 - nginx reverse-proxies port 80 → 8000
 - HTTPS works on port 443 (Let's Encrypt or Cloudflare)
@@ -1738,39 +1612,36 @@ Cloudflare gives you free HTTPS, no certbot needed.
 
 ## Weekly Mini-Project — DevOps Toolkit Repo
 
-> **Submission deadline: Sunday 11:59 PM (IST)** · **How to submit:** see **[`projects/week-01/README.md`](../projects/week-01/README.md)** (submitted on the [contest portal](https://csot-devops.devclub.in/submission), manually graded, 50 pts)
+> **Submission deadline: Sunday 11:59 PM (IST)**
 
 This project has two tracks. 
 
-### 🟢 Part A — Local Track
+### 🟢 Part A — Local Track 
 
 A GitHub repo combining Build 1 + Build 2 + extra polished shell utilities into a portfolio piece. **Runs entirely on your local Linux/WSL/Mac.** 
 
 #### Required Contents
 
-
-| File                      | Purpose                                                                         |
-| ------------------------- | ------------------------------------------------------------------------------- |
-| `README.md`               | Project intro, usage, demo screenshots                                          |
-| `DEMO.md`                 | Sample outputs of every script                                                  |
-| `.gitignore`              | Excludes `.env`, build artifacts, OS junk                                       |
-| `.env.example`            | Template env file                                                               |
-| `LICENSE`                 | MIT recommended                                                                 |
-| `scripts/backup.sh`       | Backs up a directory to `.tar.gz` with timestamp; logs run                      |
-| `scripts/log_parser.sh`   | Parses nginx/Apache logs → top IPs, 4xx/5xx counts, top URL                     |
-| `scripts/user_manager.sh` | Creates/deletes Linux users from a CSV (safe to test in container)              |
-| `scripts/sysreport.sh`    | Build 1's health monitor                                                        |
-| `scripts/deploy.sh`       | Deploys Build 2 (app + nginx + systemd) to a fresh Linux box / Docker container |
-| `systemd/`                | Unit files for Build 1's timer and Build 2's service                            |
-| `nginx/`                  | Build 2's nginx site config                                                     |
-
+| File | Purpose |
+|---|---|
+| `README.md` | Project intro, usage, demo screenshots |
+| `DEMO.md` | Sample outputs of every script |
+| `.gitignore` | Excludes `.env`, build artifacts, OS junk |
+| `.env.example` | Template env file |
+| `LICENSE` | MIT recommended |
+| `scripts/backup.sh` | Backs up a directory to `.tar.gz` with timestamp; logs run |
+| `scripts/log_parser.sh` | Parses nginx/Apache logs → top IPs, 4xx/5xx counts, top URL |
+| `scripts/user_manager.sh` | Creates/deletes Linux users from a CSV (safe to test in container) |
+| `scripts/sysreport.sh` | Build 1's health monitor |
+| `scripts/deploy.sh` | Deploys Build 2 (app + nginx + systemd) to a fresh Linux box / Docker container |
+| `systemd/` | Unit files for Build 1's timer and Build 2's service |
+| `nginx/` | Build 2's nginx site config |
 
 #### How to Demo HTTPS Without a Real Domain
 
 Pick whichever is easier:
 
 **Option 1 — Self-signed cert (works on `localhost`):**
-
 ```bash
 sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
   -keyout /etc/ssl/private/myapp.key -out /etc/ssl/certs/myapp.crt \
@@ -1784,12 +1655,10 @@ curl -k https://localhost/   # -k skips cert verification
 ```
 
 **Option 2 — Free Cloudflare Quick Tunnel (real HTTPS, real URL):**
-
 ```bash
 cloudflared tunnel --url http://localhost:8000
 # https://chunky-bear-xyz.trycloudflare.com
 ```
-
 No domain, no account, no cost. The URL is throwaway but real HTTPS.
 
 Either is acceptable for grading.
@@ -1818,7 +1687,6 @@ echo "[$ts] backed up $src → $out ($size)" | tee -a "$dest/backup.log"
 ```
 
 Usage:
-
 ```bash
 ./scripts/backup.sh ~/Documents /tmp/backups
 # [20260525-103200] backed up /home/sumit/Documents → /tmp/backups/Documents-20260525-103200.tar.gz (842M)
@@ -1856,70 +1724,103 @@ awk '$9 ~ /^5/' "$log" | wc -l
 
 #### Submission Checklist (Part A)
 
-- Public GitHub repo
-- All 5 scripts work (run `./script.sh --help` or with sample input → meaningful output)
-- Build 1 systemd timer is set up and running (screenshot in DEMO.md)
-- Build 2 nginx works on `localhost` with either self-signed HTTPS **or** Cloudflare Tunnel
-- Each script handles missing args, empty input, file-not-found
-- `.env.example` committed; `.env` git-ignored
-- Commit history: ≥ 4 commits across 2+ branches with one merge
-- `**trufflehog git file://. --only-verified` returns clean**
+- [ ] Public GitHub repo
+- [ ] All 5 scripts work (run `./script.sh --help` or with sample input → meaningful output)
+- [ ] Build 1 systemd timer is set up and running (screenshot in DEMO.md)
+- [ ] Build 2 nginx works on `localhost` with either self-signed HTTPS **or** Cloudflare Tunnel
+- [ ] Each script handles missing args, empty input, file-not-found
+- [ ] `.env.example` committed; `.env` git-ignored
+- [ ] Commit history: ≥ 4 commits across 2+ branches with one merge
+- [ ] **`trufflehog git file://. --only-verified` returns clean**
 
 #### Grading Rubric — Part A (50 pts)
 
+| Criterion | Points |
+|---|---|
+| All 5 scripts functional | 15 |
+| Build 2's nginx + HTTPS (any flavor) works | 10 |
+| Build 1's systemd timer configured correctly | 5 |
+| Error handling / edge cases | 5 |
+| README + DEMO.md quality | 5 |
+| Git hygiene (branches, commits, merge) | 5 |
+| **TruffleHog clean** (auto-fail if any leaked secret in history) | 5 |
 
-| Criterion                                                        | Points |
-| ---------------------------------------------------------------- | ------ |
-| All 5 scripts functional                                         | 15     |
-| Build 2's nginx + HTTPS (any flavor) works                       | 10     |
-| Build 1's systemd timer configured correctly                     | 5      |
-| Error handling / edge cases                                      | 5      |
-| README + DEMO.md quality                                         | 5      |
-| Git hygiene (branches, commits, merge)                           | 5      |
-| **TruffleHog clean** (auto-fail if any leaked secret in history) | 5      |
+### 🟡 Part B — Cloud Track 
 
+For students who have:
+- A free-tier cloud VM (**Oracle ARM is best** — 4 cores / 24 GB RAM, free forever; AWS t2.micro and GCP e2-micro also work)
+- **A real domain** (~$1/yr `.xyz` from Namecheap, or use Cloudflare's free subdomain)
+
+#### What to Do
+
+1. Provision a VM (manual setup is fine for this week; Week 5 teaches Terraform)
+2. Run your `scripts/deploy.sh` from Part A against the new VM
+3. Point your domain at the VM's public IP (via Cloudflare DNS)
+4. Get a **real Let's Encrypt cert** via Certbot:
+   ```bash
+   sudo certbot --nginx -d api.yourdomain.com
+   ```
+5. **Harden SSH**:
+   - Disable root login: `PermitRootLogin no` in `/etc/ssh/sshd_config`
+   - Key-only auth: `PasswordAuthentication no`
+   - Install fail2ban: `sudo apt install fail2ban`
+   - (Optional) Move SSH off port 22
+6. App keeps running after you close laptop (it's on the VM under systemd)
+7. Verify cert from another machine: `curl -v https://api.yourdomain.com/`
+
+#### Submission Checklist (Part B)
+
+- [ ] Public URL responds: `curl -sI https://api.yourdomain.com/` returns 200
+- [ ] Real Let's Encrypt cert (`curl -v` shows `subject: CN=api.yourdomain.com`)
+- [ ] SSH hardened (`sshd -T | grep -i 'permitrootlogin\|passwordauth'`)
+- [ ] README section "Cloud Deployment" reproducible end-to-end
+- [ ] Screenshot of cert details
+
+#### Grading Rubric — Part B (+10 pts)
+
+| Criterion | Points |
+|---|---|
+| Live public URL | 3 |
+| Real Let's Encrypt cert visible in `curl -v` | 3 |
+| SSH hardened (key-only, no root, fail2ban) | 2 |
+| README documents the cloud setup reproducibly | 2 |
 
 ---
 
-## Alternative Mini-Project Ideas (Optional) 
+## Alternative Mini-Project Ideas
 
 Pick one of these instead of the default.
 
 ### 1. Hardened Personal Server
-
 Take a free-tier VM (Oracle ARM, AWS t2.micro, GCP e2-micro). Harden SSH (key-only, disable root login, change port, `fail2ban`). Install nginx + HTTPS via Certbot. Deploy a portfolio HTML page. Write a `systemd` service for an uptime monitor that pings 3 services and logs to journalctl.
 
 **Deliverables**: Repo with all configs + an SSH-test report proving lockdown.
 
 ### 2. Self-Hosted Status Page
-
 Pure bash + nginx project. systemd timer pings 5 services every minute, generates a static HTML status page served by nginx. Bonus: Discord/Slack webhook on outage.
 
 **Deliverables**: Repo + live URL.
 
 ### 3. Auto-Backup System
-
 `rsync` over SSH to a remote host on a schedule (systemd timer), with rotation (keep last 7 daily, 4 weekly, 12 monthly) and email/Discord notification on failure.
 
 **Deliverables**: Repo + journalctl output showing successful runs.
 
 ### 4. Log Analytics CLI
-
 Pure-shell tool that parses nginx/Apache logs into a clean Markdown or HTML daily report. Supports filtering by date range, IP range, status code. Outputs charts (using ASCII or `gnuplot`).
 
 **Deliverables**: Repo + sample reports.
 
 ### 5. `devbox`-Style Dotfiles Manager
-
 A shell tool that bootstraps a new Linux machine with your tools, configs, and dotfiles in one command. Idempotent. Uses Git for the dotfiles.
 
 **Deliverables**: Repo + tested on fresh Docker container.
 
 ### 6. (AI Track) LLM Rate-Limit Logger
-
 nginx as reverse proxy in front of a free LLM API (Gemini/Groq). Shell script parses access logs to track token usage and rate limits per minute. Outputs a daily report. systemd timer.
 
 **Deliverables**: Repo + daily report sample + nginx config.
+
 
 ## Contest reference — tasks, scoring, rules
 
@@ -1935,7 +1836,7 @@ whole folder or one task at a time via the `csot` CLI.
 Live **overall** and **weekly** leaderboards: [csot-devops.devclub.in/leaderboard](https://csot-devops.devclub.in/leaderboard).
 
 📖 **Full task specs, skeleton examples, and grader rules:**
-**[csot-devops.devclub.in/contest/week-01](https://csot-devops.devclub.in/contest/week-01)** ←
+[**csot-devops.devclub.in/contest/week-01**](https://csot-devops.devclub.in/contest/week-01) ←
 *everything you need is there; this section is the elevator pitch.*
 
 ### 60-second start
@@ -1960,22 +1861,20 @@ csot update                             # pull latest CLI
 
 ### The 12 tasks (summary — full specs on the site)
 
-
-| #   | What                                              | Submit as                 | Pts | Partial? |
-| --- | ------------------------------------------------- | ------------------------- | --- | -------- |
-| 1   | Find files larger than 1 MiB, sorted desc by size | `01.sh`                   | 7   | yes      |
-| 2   | Count unique IPv4 addresses in a log              | `02.sh`                   | 7   | yes      |
-| 3   | Replace tabs with 4 spaces, recursively in place  | `03.sh`                   | 7   | —        |
-| 4   | Rename `*.txt` → `*.md` recursively               | `04.sh`                   | 7   | —        |
-| 5   | Parse JSON with `jq` (active users' emails)       | `05.sh`                   | 9   | yes      |
-| 6   | Retry a command with exponential backoff          | `06.sh`                   | 10  | yes      |
-| 7   | systemd timer running `Hello World` every minute  | `07.service` + `07.timer` | 9   | yes      |
-| 8   | nginx reverse-proxy config + `X-Powered-By: csot` | `08.conf`                 | 9   | yes      |
-| 9   | Self-signed cert + nginx HTTPS on `:8443`         | `09.sh`                   | 10  | yes      |
-| 10  | Top 10 directories by disk usage                  | `10.sh`                   | 8   | —        |
-| 11  | List all running systemd services                 | `11.sh`                   | 7   | —        |
-| 12  | `todo` CLI in pure bash (capstone)                | `12-todo/todo.sh`         | 10  | yes      |
-
+| # | What | Submit as | Pts | Partial? |
+|---|---|---|---|:---:|
+| 1 | Find files larger than 1 MiB, sorted desc by size | `01.sh` | 7 | yes |
+| 2 | Count unique IPv4 addresses in a log | `02.sh` | 7 | yes |
+| 3 | Replace tabs with 4 spaces, recursively in place | `03.sh` | 7 | — |
+| 4 | Rename `*.txt` → `*.md` recursively | `04.sh` | 7 | — |
+| 5 | Parse JSON with `jq` (active users' emails) | `05.sh` | 9 | yes |
+| 6 | Retry a command with exponential backoff | `06.sh` | 10 | yes |
+| 7 | systemd timer running `Hello World` every minute | `07.service` + `07.timer` | 9 | yes |
+| 8 | nginx reverse-proxy config + `X-Powered-By: csot` | `08.conf` | 9 | yes |
+| 9 | Self-signed cert + nginx HTTPS on `:8443` | `09.sh` | 10 | yes |
+| 10 | Top 10 directories by disk usage | `10.sh` | 8 | — |
+| 11 | List all running systemd services | `11.sh` | 7 | — |
+| 12 | `todo` CLI in pure bash (capstone) | `12-todo/todo.sh` | 10 | yes |
 
 **Total: 100 points.**
 
@@ -1998,29 +1897,29 @@ Each task page lists **Submit as**, **Input**, **Output**, skeleton examples (no
 ## Resources
 
 ### Books (Free)
-
 - *The Linux Command Line* — William Shotts (free PDF: linuxcommand.org)
 - *Pro Git* — Chacon & Straub (git-scm.com/book)
 - *The Twelve-Factor App* — 12factor.net
 
-### Videos
+### Courses
+- *Missing Semester* (MIT) — Lectures 1, 2, 5, 6 (missing.csail.mit.edu)
+- *Learn Git Branching* — learngitbranching.js.org (interactive)
 
+### Videos
 - TechWorld with Nana — Linux Crash Course
 - DevOps Toolkit — nginx Tutorial
 - Computerphile — How DNS Works
 
 ### Cheatsheets
-
 - `tldr` command (`sudo apt install tldr` then `tldr nginx`)
 - DevHints.io (lots of one-pagers)
 - nginx Beginner's Guide (nginx.org)
 
 ### Tutorials
-
 - DigitalOcean — *How To Install nginx on Ubuntu*
 - DigitalOcean — *Secure nginx with Let's Encrypt*
 - DigitalOcean — *Initial Server Setup with Ubuntu*
 
 ---
 
-**Next week: Week 2 — CI/CD, Quality Engineering & Registries.** You'll take the Build 2 app and add a full GitHub Actions pipeline (lint → test → schema check → TruffleHog → build → push to GHCR).
+**Next week: Week 2 — Docker, Compose & Container Debugging.** You'll containerize a multi-service app with Docker Compose and learn to debug real stack incidents.

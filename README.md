@@ -13,7 +13,7 @@
 | ---- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1    | [week-01-linux-networking-git.md](./content/week-01-linux-networking-git.md) | Linux, shell, networking, Git, nginx, systemd · [contest](https://csot-devops.devclub.in/contest/week-01) (100 pts, [submit guide](./submission/README.md)) · [mini-project](./projects/week-01/README.md) |
 | 2    | [week-02-docker-compose-debugging.md](./content/week-02-docker-compose-debugging.md) | Docker, Compose, container debugging, image hygiene · [contest](https://csot-devops.devclub.in/contest/week-02) (200 pts, [submit guide](./submission/README.md)) · [mini-project](./projects/week-02/README.md) |
-| 3    | Week 3                                                                       | CI/CD, GitHub Actions, quality gates, GHCR                                                                                                                                                                 |
+| 3    | [week-03-guide.md](./week-03-guide.md) · [week-03-projects.md](./week-03-projects.md) · [modules](./content/week-02-cicd-quality-registries.md) | CI/CD, GitHub Actions, quality gates, GHCR (**100-pt submission**)                                                                                                                                         |
 | 4    | Week 4                                                                       | Kubernetes, Helm, GitOps                                                                                                                                                                                   |
 | 5    | Week 5                                                                       | Terraform, AWS, Cloudflare, FinOps                                                                                                                                                                         |
 | 6    | Week 6                                                                       | Observability, SRE, capstone                                                                                                                                                                               |
@@ -123,7 +123,9 @@ Package once, run anywhere — securely and slim, then debug it when it breaks. 
 
 ### Week 3 — CI/CD, Quality Engineering & Registries
 
-Automate everything from commit to artifact, and never let a broken or insecure build ship. Topics covered:
+ **[Student guide](./week-03-guide.md)** · **[Submission rubric (100 pts)](./week-03-projects.md)** · **[Module deep-dive](./content/week-02-cicd-quality-registries.md)**
+
+Automate everything from commit to artifact, and never let a broken or insecure build ship. **Prerequisite:** Week 2 Docker repo (`Dockerfile` + `compose.yaml`). Topics covered:
 
 - **Why CI/CD** — pipeline stages, Continuous Integration vs Delivery vs Deployment, tool landscape (Actions, Jenkins, GitLab CI, CircleCI)
 - **GitHub Actions Anatomy** — workflows, jobs, steps, runners, triggers (`push`, `pull_request`, `schedule`, `workflow_dispatch`), the Action marketplace + SHA pinning

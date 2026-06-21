@@ -99,7 +99,7 @@ Full teaching content: [`content/week-02-cicd-quality-registries.md`](./content/
 | **7** | Jenkins awareness | Read only — interview prep |
 | **8** | Other CI tools | Skim GitLab CI / CircleCI comparison |
 
-**Supply chain (used in CI this week):** add Trivy + Syft steps — see [Module 5 in week-03-containers-compose-security.md](./content/week-03-containers-compose-security.md#module-5--image-security--supply-chain) for scan commands only.
+**Supply chain (used in CI this week):** add Trivy + Syft steps — Trivy basics from [Week 2 Module 7](./content/week-02-docker-compose-debugging.md#module-7--basic-image-security-with-trivy); Syft/SBOM in CI covered in [Build 2](./content/week-02-cicd-quality-registries.md#build-2--build--push-to-ghcr-fri) below.
 
 ---
 
