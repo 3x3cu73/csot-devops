@@ -1,67 +1,69 @@
-# Week 3 Project — Production CI/CD Pipeline
+# Week 3 Project — CI/CD + Live Deploy
 
-## How to submit
+## Quick start
 
-1. Push your Week 2 + Week 3 work to a **public** GitHub repo.
-2. Confirm the latest Actions run on **`main`** is green.
-3. Go to **[csot-devops.devclub.in/submission](https://csot-devops.devclub.in/submission)** → **Week 3**.
-4. Paste your repo URL (folder `.` unless the project is in a subfolder).
-5. Wait for autograding (usually 2–10 minutes). **Resubmit** after pushing fixes.
-
-There is **no** `csot submit` for Week 3.
+1. Fork [**csot-w3-starter**](https://github.com/sumit-IITD/csot-w3-starter) — Flask + SQLite, no Docker/CI yet.
+2. Build everything listed below.
+3. Submit on the **[submission portal](https://csot-devops.devclub.in/submission)** → Week 3 (paste a fine-grained PAT).
+4. Copy your **deploy sandbox** credentials into GitHub secrets.
+5. Click **Verify live 1.0.0** once your app is deployed.
 
 ---
 
-## What the autograder checks (240 pts base)
-
-Runs against a **clone of your repo** at the submitted commit:
-
-### Workflows (static)
-
-- All `.github/workflows/*.{yml,yaml}` pass **`actionlint`**
-- No runner typos (`ubuntu-latest`, not `ubntu-latest`)
-- Jobs: **lint**, **test** (with coverage artifact), **secret scan**, **dependency scan**, **schema/contract test**, **Trivy**
-- **`docker/build-push-action`** present
-- **Build job gated** with `needs:` on lint/test
-- **Matrix** with ≥2 runtime versions
-- **Reusable workflow** (`workflow_call`) or **composite action**
-- **File-size guard** step (>1 MB fail)
-
-### Live Docker + tests
-
-- `docker build` succeeds using your **Dockerfile**
-- `docker compose config` valid with **≥2 services** and a **healthcheck**
-- **pytest** passes locally with **≥70% coverage**
-
-### GitHub + AI (+60 pts)
+## Act 1 — CI & containerize (200 pts)
 
 | Check | Pts |
 |-------|-----|
-| Completed Actions run for submitted commit = **success** | +12 |
-| lint + test + build jobs green on GitHub | +10 |
-| GHCR package exists | +8 |
-| README / pipeline documentation (AI rubric) | +30 |
+| `tests/` with `test_*.py` files | 5 |
+| CI workflow runs pytest | 5 |
+| Coverage ≥70% gate (`--cov-fail-under=70`) | 5 |
+| Submitted commit CI all green | 10 |
+| AI test review — route coverage, schema, # of tests | 15 |
+| Lint job in CI | 5 |
+| Linter tool (ruff / flake8 / pylint) | 5 |
+| Secret scan (TruffleHog / gitleaks) | 5 |
+| Dependency scan (pip-audit) | 5 |
+| `Dockerfile` present | 5 |
+| `compose.yaml` present | 5 |
+| Web service uses `ports: ["0:80"]` | 5 |
+| SQLite volume / bind-mount in compose | 5 |
+| `docker/build-push-action` in CI (GHCR) | 5 |
+| `VERSION` file at repo root | 3 |
+| `GET /api/version` endpoint in app code | 3 |
+| `.github/workflows/` with CI files | 4 |
+| Deploy job with SSH in workflow | 5 |
+| **Total (scaled to 200)** | **100 raw** |
 
 ---
 
-## Symptoms if you're losing points
+## Act 2 — Live CD (100 pts)
 
-| Symptom in grader log | Likely fix |
-|-----------------------|------------|
-| `actionlint` errors | Fix YAML syntax, action versions, expression typos |
-| `build-push must needs:` | Add `needs: [lint, test, ...]` on build job |
-| `compose needs app + database` | Add DB service to compose |
-| `No completed Actions runs` | Push to `main`, wait for workflow, ensure it passes |
-| Low AI docs score | README: explain each stage, link Actions + GHCR, how to run locally |
+| Check | Pts |
+|-------|-----|
+| Deploy job exists in workflow (SSH + `docker compose`) | 10 |
+| Live app serves version `1.0.0` (click **Verify live 1.0.0** on portal) | 45 |
+| Grader commits `VERSION=1.0.1` → your CI/CD redeploys → live shows `1.0.1` | 45 |
 
----
+### Required endpoints
 
-## Deployment
+| Endpoint | Response |
+|----------|----------|
+| `GET /health` | `{"status": "ok"}` |
+| `GET /api/version` | `{"version": "<VERSION file content>"}` |
 
-**Not required.** GHCR push in CI is enough. Deploy comes in Week 4 (Kubernetes).
+### Deploy sandbox secrets
+
+From the portal → Settings → GitHub Secrets:
+
+| Secret | Value |
+|--------|-------|
+| `DEPLOY_HOST` | sandbox IP |
+| `DEPLOY_SSH_PORT` | SSH port |
+| `DEPLOY_USER` | `incident` |
+| `DEPLOY_PASSWORD` | sandbox password |
+| `DEPLOY_PATH` | deploy directory |
+| `COMPOSE_PROJECT_NAME` | compose project |
 
 ---
 
 ## Points: **300**
-
-See [`week-03-projects.md`](../../../../week-03-projects.md) in the curriculum repo for the full student rubric.
